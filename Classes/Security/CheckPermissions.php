@@ -35,6 +35,7 @@ use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\SignalSlot\Dispatcher;
+use function Webmozart\Assert\Tests\StaticAnalysis\true;
 
 /**
  * Utility functions to check permissions
@@ -253,6 +254,14 @@ class CheckPermissions implements SingletonInterface
         if (!is_array($userFeGroups)) {
             return false;
         }
+
+        $hasAccess = true;
+        $neededPermissions = GeneralUtility::trimExplode(',', $groups, true);
+        foreach ($neededPermissions as $permission) {
+            $permission = (int)$permission;
+            $hasAccess = $hasAccess && in_array($permission, $userFeGroups);
+        }
+        return $hasAccess;
 
         foreach (explode(',', $groups) as $feGroupUid) {
             if (in_array(trim($feGroupUid), $userFeGroups)) {
